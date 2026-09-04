@@ -51,6 +51,12 @@ async function iniciarHistoria(id, opcoes) {
   iniciarMinigames();
 }
 
+let estadoLeitura = {
+  paginaAtual: 0,
+  paginas: [],
+  totalPaginas: 1
+};
+
 function obterTextoCompletoHistoria(h) {
   if (!h) return '';
   if (typeof h.textoCompleto === 'string' && h.textoCompleto.trim()) {
@@ -65,13 +71,199 @@ function obterTextoCompletoHistoria(h) {
   return '';
 }
 
+function contarPalavras(textoHtmlOuPuro) {
+  if (!textoHtmlOuPuro) return 0;
+  const textOnly = textoHtmlOuPuro.replace(/<[^>]+>/g, ' ').trim();
+  if (!textOnly) return 0;
+  return textOnly.split(/\s+/).filter(Boolean).length;
+}
+
+function dividirTextoEmPaginasPorPalavras(textoCompleto, limitePalavras = 150) {
+  if (!textoCompleto || !textoCompleto.trim()) return [''];
+
+  let blocos = [];
+  if (textoCompleto.includes('</p>')) {
+    const temp = document.createElement('div');
+    temp.innerHTML = textoCompleto;
+    const ps = temp.querySelectorAll('p');
+    if (ps.length > 0) {
+      blocos = Array.from(ps).map(p => p.outerHTML.trim()).filter(Boolean);
+    }
+  }
+
+  if (!blocos.length) {
+    blocos = textoCompleto
+      .split(/\n\s*\n/)
+      .map(b => b.trim())
+      .filter(Boolean)
+      .map(b => `<p>${b}</p>`);
+  }
+
+  if (!blocos.length) {
+    blocos = [`<p>${textoCompleto.trim()}</p>`];
+  }
+
+  const paginas = [];
+  let paginaAtualHtml = '';
+  let palavrasPaginaAtual = 0;
+
+  blocos.forEach((bloco) => {
+    const textOnly = bloco.replace(/<[^>]+>/g, ' ').trim();
+    const palavrasBloco = textOnly.split(/\s+/).filter(Boolean);
+    const qtdPalavrasBloco = palavrasBloco.length;
+
+    if (qtdPalavrasBloco > limitePalavras) {
+      if (paginaAtualHtml) {
+        paginas.push(paginaAtualHtml);
+        paginaAtualHtml = '';
+        palavrasPaginaAtual = 0;
+      }
+
+      let acumPalavras = [];
+      palavrasBloco.forEach((p) => {
+        acumPalavras.push(p);
+        if (acumPalavras.length >= limitePalavras) {
+          paginas.push(`<p>${acumPalavras.join(' ')}</p>`);
+          acumPalavras = [];
+        }
+      });
+      if (acumPalavras.length > 0) {
+        paginaAtualHtml = `<p>${acumPalavras.join(' ')}</p>`;
+        palavrasPaginaAtual = acumPalavras.length;
+      }
+    } else {
+      if (paginaAtualHtml && (palavrasPaginaAtual + qtdPalavrasBloco > limitePalavras)) {
+        paginas.push(paginaAtualHtml);
+        paginaAtualHtml = bloco;
+        palavrasPaginaAtual = qtdPalavrasBloco;
+      } else {
+        paginaAtualHtml += (paginaAtualHtml ? ' ' : '') + bloco;
+        palavrasPaginaAtual += qtdPalavrasBloco;
+      }
+    }
+  });
+
+  if (paginaAtualHtml) {
+    paginas.push(paginaAtualHtml);
+  }
+
+  return paginas.length > 0 ? paginas : [textoCompleto];
+}
+
+function renderizarPaginaAtualLivro(direcaoAnimacao = null) {
+  const h = estado.historiaAtual;
+  if (!h) return;
+
+  const total = estadoLeitura.totalPaginas || 1;
+  const atual = Math.max(0, Math.min(total - 1, estadoLeitura.paginaAtual || 0));
+  estadoLeitura.paginaAtual = atual;
+
+  const tituloBadge = document.getElementById('leitura-titulo-badge');
+  if (tituloBadge) tituloBadge.textContent = h.titulo || 'História';
+
+  const labelEl = document.getElementById('fase-atual-label');
+  if (labelEl) labelEl.textContent = 'História Completa';
+
+  const cenaEl = document.getElementById('historia-emoji-cena');
+  if (cenaEl) cenaEl.textContent = h.cena || (h.fases && h.fases[0] && h.fases[0].cena) || '📖';
+
+  const indicadorEl = document.getElementById('livro-pagina-indicador');
+  if (indicadorEl) {
+    indicadorEl.textContent = `${atual + 1} / ${total}`;
+  }
+
+  const conteudoPagina = estadoLeitura.paginas[atual] || '';
+
+  const textoEl = document.getElementById('historia-texto');
+  const cartaoEl = document.getElementById('cartao-livro-leitura');
+
+  if (textoEl) {
+    textoEl.innerHTML = conteudoPagina;
+    textoEl.classList.toggle('sem-destaque', !estado.destaqueAtivo);
+  }
+
+  if (direcaoAnimacao && cartaoEl) {
+    cartaoEl.classList.remove('pagina-virando-avancar', 'pagina-virando-recuar');
+    void cartaoEl.offsetWidth;
+    cartaoEl.classList.add(direcaoAnimacao === 'recuar' ? 'pagina-virando-recuar' : 'pagina-virando-avancar');
+  }
+
+  const navPaginas = document.getElementById('livro-navegacao-paginas');
+  const btnAnt = document.getElementById('btn-pagina-anterior');
+  const btnProx = document.getElementById('btn-proxima-pagina');
+  const btnContinuar = document.getElementById('btn-continuar');
+
+  if (navPaginas) {
+    navPaginas.style.display = total > 1 ? 'flex' : 'none';
+  }
+
+  if (btnAnt) {
+    btnAnt.disabled = (atual === 0);
+  }
+
+  if (btnProx) {
+    if (atual >= total - 1) {
+      btnProx.style.display = 'none';
+    } else {
+      btnProx.style.display = 'inline-flex';
+      btnProx.disabled = false;
+    }
+  }
+
+  const dotsContainer = document.getElementById('livro-paginacao-dots');
+  if (dotsContainer) {
+    dotsContainer.innerHTML = '';
+    if (total > 1) {
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = `pag-dot ${i === atual ? 'ativa' : ''}`;
+        dot.title = `Ir para página ${i + 1}`;
+        dot.onclick = () => irParaPaginaLivro(i);
+        dotsContainer.appendChild(dot);
+      }
+    }
+  }
+
+  if (btnContinuar) {
+    const isUltima = (atual >= total - 1);
+    const n = (estado.minigamesLista && estado.minigamesLista.length) || 5;
+    btnContinuar.textContent = `Vamos Jogar! 🚀 (${n} minigame${n > 1 ? 's' : ''})`;
+    btnContinuar.style.display = isUltima ? 'block' : 'none';
+    if (isUltima && total > 1) {
+      btnContinuar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+}
+
+function virarPaginaAnterior() {
+  if (estadoLeitura.paginaAtual > 0) {
+    estadoLeitura.paginaAtual--;
+    renderizarPaginaAtualLivro('recuar');
+  }
+}
+
+function virarProximaPagina() {
+  if (estadoLeitura.paginaAtual < estadoLeitura.totalPaginas - 1) {
+    estadoLeitura.paginaAtual++;
+    renderizarPaginaAtualLivro('avancar');
+  }
+}
+
+function irParaPaginaLivro(num) {
+  if (num >= 0 && num < estadoLeitura.totalPaginas && num !== estadoLeitura.paginaAtual) {
+    const dir = num < estadoLeitura.paginaAtual ? 'recuar' : 'avancar';
+    estadoLeitura.paginaAtual = num;
+    renderizarPaginaAtualLivro(dir);
+  }
+}
+
 function lerTextoCompletoHistoria(opcoes) {
-  const opts = opcoes || {};
   const h = estado.historiaAtual;
   if (!h) {
     mostrarToast('Escolha uma história primeiro! 📚');
     return;
   }
+
   const textoCompleto = obterTextoCompletoHistoria(h);
   if (!textoCompleto.trim()) {
     mostrarToast('Esta história ainda não tem texto para ler.');
@@ -81,23 +273,18 @@ function lerTextoCompletoHistoria(opcoes) {
   irParaTela('leitura');
   setUiLeituraModoCompleto(true);
 
-  const badgeEl = document.getElementById('leitura-titulo-badge');
-  if (badgeEl) badgeEl.textContent = h.titulo;
-
-  const labelEl = document.getElementById('fase-atual-label');
-  if (labelEl) labelEl.textContent = 'História completa';
-
-  const cenaEl = document.getElementById('historia-emoji-cena');
-  if (cenaEl) cenaEl.textContent = h.cena || (h.fases && h.fases[0] && h.fases[0].cena) || '📖';
-
-  const textoEl = document.getElementById('historia-texto');
-  if (textoEl) {
-    textoEl.innerHTML = textoCompleto;
-    textoEl.classList.toggle('sem-destaque', !estado.destaqueAtivo);
-    textoEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  let paginas = [];
+  if (Array.isArray(h.fases) && h.fases.length > 1) {
+    paginas = h.fases.map(f => `<p>${f.texto || ''}</p>`);
+  } else {
+    paginas = dividirTextoEmPaginasPorPalavras(textoCompleto, 150);
   }
 
-  if (opts.somenteExibir) return;
+  estadoLeitura.paginas = paginas;
+  estadoLeitura.totalPaginas = paginas.length;
+  estadoLeitura.paginaAtual = 0;
+
+  renderizarPaginaAtualLivro(null);
 }
 
 function setUiLeituraModoCompleto(completo) {
@@ -106,10 +293,10 @@ function setUiLeituraModoCompleto(completo) {
   const barra = document.querySelector('.barra-progresso-fases');
   const inter = document.getElementById('interacao-area');
   const btnPular = document.getElementById('btn-pular-fase');
-  if (faseInd) faseInd.style.display = completo ? 'none' : '';
-  if (barra) barra.style.display = completo ? 'none' : '';
-  if (inter) inter.style.display = completo ? 'none' : '';
-  if (btnPular) btnPular.style.display = completo ? 'none' : '';
+  if (faseInd) faseInd.style.display = completo ? '' : '';
+  if (barra) barra.style.display = 'none';
+  if (inter) inter.style.display = 'none';
+  if (btnPular) btnPular.style.display = 'none';
 }
 
 function mostrarLeituraCompleta() {
@@ -118,13 +305,6 @@ function mostrarLeituraCompleta() {
 
   estado.modoLeituraCompleta = true;
   lerTextoCompletoHistoria({ autoOuvir: estado.perfil.faixa === 1 });
-
-  const n = (estado.minigamesLista && estado.minigamesLista.length) || 0;
-  const btn = document.getElementById('btn-continuar');
-  if (btn) {
-    btn.textContent = `Vamos Jogar! 🚀 (${n} minigame${n > 1 ? 's' : ''})`;
-    btn.style.display = 'block';
-  }
 }
 
 function renderizarFase() {

@@ -51,20 +51,18 @@ function iniciarSequenciaMinigames() {
 
 function nomeMinigame(tipo) {
   const nomes = {
-    memoria: '🃏 Jogo da Memória',//
-    som_palavra: '🔊 Som e Palavra',//
+    jogo_memoria: '🃏 Jogo da Memória',
+    som_palavra: '🔊 Som e Palavra',
     monta_frase: '🧩 Monta-Frase',
     verdadeiro_falso: '✅ Verdadeiro ou Falso?',
     caca_palavras: '🔍 Caça-Palavras',
-    ligar_pontos: '🔗 Ligar os Pontos',//
-    rima: '🎵 Encontre a Rima',//
-    quem_disse: '💬 Quem Disse Isso?',//
-    ordenar_passos: '📋 Ordene os Passos', //
-    escolha: '❓ Escolha Múltipla',//
-    completar: '✍️ Completar',//
-    //colorir:         '🎨 Colorir Palavras',
+    ligar_pontos: '🔗 Ligar os Pontos',
+    rima: '🎵 Encontre a Rima',
+    quem_disse: '💬 Quem Disse Isso?',
+    ordenar_passos: '📋 Ordene os Passos',
+    escolha: '❓ Escolha Múltipla',
+    completar: '✍️ Completar',
     palavras_perdidas: '🧠 Palavras Perdidas'
-    //minigame de qual titulo combina
   };
   return nomes[tipo] || tipo;
 }
@@ -91,7 +89,7 @@ function renderizarMinigame() {
   const corpo = document.getElementById('minigame-corpo');
   corpo.innerHTML = '';
 
-  const tiposSemEnunciadoDuplicado = ['completar', 'palavras_perdidas', 'escolha', 'verdadeiro_falso', 'som_palavra', 'rima', 'quem_disse'];
+  const tiposSemEnunciadoDuplicado = ['completar', 'palavras_perdidas', 'escolha', 'verdadeiro_falso', 'som_palavra', 'rima', 'quem_disse', 'memoria', 'jogo_memoria'];
   if (!tiposSemEnunciadoDuplicado.includes(tipo)) {
     const header = document.createElement('div');
     header.className = 'mg-enunciado';

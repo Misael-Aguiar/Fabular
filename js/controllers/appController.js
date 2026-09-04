@@ -223,6 +223,24 @@ async function inicializar() {
   bindSeExistir('btn-pular-fase', 'click', pularFase);
   bindSeExistir('btn-voltar-biblioteca', 'click', () => irParaTela('biblioteca'));
 
+  bindSeExistir('btn-pagina-anterior', 'click', () => {
+    if (typeof virarPaginaAnterior === 'function') virarPaginaAnterior();
+  });
+  bindSeExistir('btn-proxima-pagina', 'click', () => {
+    if (typeof virarProximaPagina === 'function') virarProximaPagina();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    const telaLeitura = document.getElementById('tela-leitura');
+    if (telaLeitura && telaLeitura.classList.contains('ativa')) {
+      if (e.key === 'ArrowLeft') {
+        if (typeof virarPaginaAnterior === 'function') virarPaginaAnterior();
+      } else if (e.key === 'ArrowRight') {
+        if (typeof virarProximaPagina === 'function') virarProximaPagina();
+      }
+    }
+  });
+
   bindSeExistir('btn-proximo-mg', 'click', proximoMinigame);
   bindSeExistir('btn-finalizar-mg', 'click', finalizarMinigames);
   bindSeExistir('btn-voltar-leitura', 'click', () => {

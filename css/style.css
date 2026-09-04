@@ -4124,7 +4124,7 @@ body.alto-contraste {
   --glass-border: rgba(255, 255, 255, 0.12);
   --shadow: 0 6px 26px rgba(0, 0, 0, 0.36);
   --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
-  background-color: #0D1117 !important;
+  background-color: #ffffff !important;
   color: #E6EDF3 !important;
 }
 
@@ -4837,6 +4837,51 @@ body.alto-contraste .mem-card .mem-frente {
 body.alto-contraste .mem-card .mem-verso {
   background: #2d3748 !important;
   color: #ffffff !important;
+}
+
+/* Caça-Palavras no Modo Escuro */
+body.alto-contraste .cp-cel {
+  background: #1c2430 !important;
+  border-color: #30363d !important;
+  color: #e6edf3 !important;
+  font-weight: 800 !important;
+}
+
+body.alto-contraste .cp-cel:hover:not(.cp-found):not(.cp-sel) {
+  background: #253447 !important;
+  color: #a78bfa !important;
+  border-color: #6e40c9 !important;
+}
+
+body.alto-contraste .cp-cel.cp-sel {
+  background: #4c1d95 !important;
+  border-color: #a78bfa !important;
+  color: #f3e8ff !important;
+}
+
+body.alto-contraste .cp-cel.cp-preview {
+  background: #2e1b50 !important;
+  border-color: #7c3aed !important;
+  color: #ddd6fe !important;
+}
+
+body.alto-contraste .cp-cel.cp-found {
+  background: #064e3b !important;
+  border-color: #10b981 !important;
+  color: #6ee7b7 !important;
+}
+
+body.alto-contraste .cp-cel.cp-wrong {
+  background: #4c0519 !important;
+  border-color: #f43f5e !important;
+  color: #fda4af !important;
+}
+
+body.alto-contraste .cp-cel.cp-missed {
+  background: #431407 !important;
+  border-color: #f97316 !important;
+  color: #fed7aa !important;
+  font-weight: 900 !important;
 }
 
 body.alto-contraste .toast {
@@ -5939,4 +5984,328 @@ body.alto-contraste .config-stat strong {
   color: #C2410C !important;
   font-weight: 800 !important;
   font-size: 1.45rem !important;
+}
+
+/* =============================================
+   CARTÃO DO LIVRO DE LEITURA E PAGINAÇÃO POR 150 PALAVRAS
+   ============================================= */
+
+.cartao-livro-leitura {
+  position: relative;
+  background: linear-gradient(135deg, #FFFDF9 0%, #FAF5EA 100%);
+  border-radius: 20px;
+  padding: 24px 28px;
+  border: 2px solid #E2D7C3;
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.09),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 0 0 4px rgba(245, 235, 215, 0.6);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Camada da Folha Embaixo (Underneath Page Effect) */
+.cartao-livro-leitura::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #F5EFE0 0%, #EBE1CB 100%);
+  border-radius: 20px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.cartao-livro-leitura > * {
+  position: relative;
+  z-index: 1;
+}
+
+.livro-folha-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(180, 160, 120, 0.4);
+  font-family: 'Baloo 2', cursive, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--cor-primaria, #FF6B35);
+}
+
+.livro-contagem-palavras {
+  font-size: 0.82rem;
+  color: #8C7B6B;
+  font-weight: 600;
+  background: rgba(180, 160, 120, 0.14);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.historia-texto {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1.95;
+  color: var(--texto, #2D3748);
+  min-height: 120px;
+}
+
+/* Animação de troca de página: slide + fade */
+.cartao-livro-leitura.pagina-virando-avancar {
+  animation: slideFadeAvancar 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.cartao-livro-leitura.pagina-virando-recuar {
+  animation: slideFadeRecuar 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes slideFadeAvancar {
+  0% {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideFadeRecuar {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* NAVEGAÇÃO POR PÁGINAS RESPONSIVA PARA CELULAR E COMPUTADOR */
+.livro-navegacao-paginas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1.5px dashed rgba(180, 160, 120, 0.4);
+}
+
+.livro-nav-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.livro-pagina-indicador {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #9A8672;
+  letter-spacing: 0.04em;
+}
+
+.btn-virar-pagina {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: 'Baloo 2', cursive, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--cor-primaria, #FF6B35);
+  background: transparent;
+  border: 2px solid var(--cor-primaria, #FF6B35);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--trans);
+  min-height: 38px;
+}
+
+.btn-virar-pagina:hover:not(:disabled) {
+  background: var(--cor-primaria, #FF6B35);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.btn-virar-pagina:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-virar-pagina .seta {
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.btn-pagina-anterior:hover:not(:disabled) .seta {
+  transform: translateX(-3px);
+}
+
+.btn-proxima-pagina:hover:not(:disabled) .seta {
+  transform: translateX(3px);
+}
+
+.livro-paginacao-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(180, 160, 120, 0.35);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pag-dot.ativa {
+  width: 20px;
+  border-radius: 8px;
+  background: var(--cor-primaria, #FF6B35);
+  box-shadow: 0 0 6px rgba(255, 107, 53, 0.4);
+}
+
+/* Responsivo para Celular */
+@media (max-width: 640px) {
+  .cartao-livro-leitura {
+    padding: 18px 16px;
+    border-radius: 16px;
+  }
+
+  .historia-texto {
+    font-size: 1rem;
+    line-height: 1.85;
+  }
+
+  .livro-navegacao-paginas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .btn-virar-pagina {
+    flex: 1 1 45%;
+    max-width: 48%;
+    padding: 8px 10px;
+    font-size: 0.88rem;
+    min-height: 44px;
+    border-radius: 10px;
+  }
+
+  .btn-virar-pagina .btn-texto-completo {
+    display: none;
+  }
+
+  .btn-virar-pagina .btn-texto-curto {
+    display: inline;
+  }
+
+  .livro-paginacao-dots {
+    gap: 4px;
+  }
+
+  .pag-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .pag-dot.ativa {
+    width: 16px;
+  }
+}
+
+@media (min-width: 641px) {
+  .btn-virar-pagina .btn-texto-curto {
+    display: none;
+  }
+  .btn-virar-pagina .btn-texto-completo {
+    display: inline;
+  }
+}
+
+/* MODO ESCURO — Fundo da página cinza e letras do texto brancas */
+body.modo-noturno .cartao-livro-leitura,
+body.alto-contraste .cartao-livro-leitura,
+html.modo-noturno .cartao-livro-leitura,
+html.alto-contraste .cartao-livro-leitura {
+  background: #2D2D2D !important;
+  border-color: #444444 !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), inset 0 0 0 4px #383838 !important;
+}
+
+body.modo-noturno .cartao-livro-leitura::before,
+body.alto-contraste .cartao-livro-leitura::before,
+html.modo-noturno .cartao-livro-leitura::before,
+html.alto-contraste .cartao-livro-leitura::before {
+  background: #242424 !important;
+  opacity: 0.8 !important;
+}
+
+body.modo-noturno .historia-texto,
+body.modo-noturno .historia-texto p,
+body.modo-noturno .historia-texto span,
+body.alto-contraste .historia-texto,
+body.alto-contraste .historia-texto p,
+body.alto-contraste .historia-texto span,
+html.modo-noturno .historia-texto,
+html.modo-noturno .historia-texto p,
+html.modo-noturno .historia-texto span,
+html.alto-contraste .historia-texto,
+html.alto-contraste .historia-texto p,
+html.alto-contraste .historia-texto span {
+  color: #FFFFFF !important;
+}
+
+body.modo-noturno .historia-texto .palavra-chave,
+body.alto-contraste .historia-texto .palavra-chave,
+html.modo-noturno .historia-texto .palavra-chave,
+html.alto-contraste .historia-texto .palavra-chave {
+  background: #E65100 !important;
+  color: #FFFFFF !important;
+}
+
+body.modo-noturno .livro-folha-topo,
+body.alto-contraste .livro-folha-topo,
+html.modo-noturno .livro-folha-topo,
+html.alto-contraste .livro-folha-topo {
+  border-bottom-color: rgba(255, 255, 255, 0.15) !important;
+  color: #FF8A65 !important;
+}
+
+body.modo-noturno .livro-contagem-palavras,
+body.alto-contraste .livro-contagem-palavras,
+html.modo-noturno .livro-contagem-palavras,
+html.alto-contraste .livro-contagem-palavras {
+  color: #E0E0E0 !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.modo-noturno .livro-pagina-indicador,
+body.alto-contraste .livro-pagina-indicador,
+html.modo-noturno .livro-pagina-indicador,
+html.alto-contraste .livro-pagina-indicador {
+  color: #FF8A65 !important;
+}
+
+body.modo-noturno .livro-navegacao-paginas,
+body.alto-contraste .livro-navegacao-paginas,
+html.modo-noturno .livro-navegacao-paginas,
+html.alto-contraste .livro-navegacao-paginas {
+  background: #25201D !important;
+  border-color: rgba(78, 205, 196, 0.25) !important;
 }

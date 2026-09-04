@@ -136,13 +136,11 @@
         <section id="tela-leitura" class="tela-app">
           <div class="leitura-container">
             <div class="leitura-header">
-              <button class="btn-voltar" id="btn-voltar-biblioteca" aria-label="Voltar à biblioteca">←
-                Biblioteca</button>
+              <button class="btn-voltar" id="btn-voltar-biblioteca" aria-label="Voltar à biblioteca">← Biblioteca</button>
               <div class="leitura-info">
                 <span class="leitura-titulo-badge" id="leitura-titulo-badge">Título</span>
                 <div class="fase-indicador">
-                  <span id="fase-atual-label">Fase 1</span>
-                  <div class="fase-dots" id="fase-dots"></div>
+                  <span id="fase-atual-label">História Completa</span>
                 </div>
               </div>
               <div class="leitura-acoes">
@@ -152,25 +150,43 @@
                   aria-label="Destacar palavras-chave">🔍</button>
               </div>
             </div>
-            <div class="barra-progresso-fases">
-              <div class="barra-progresso-fill" id="barra-fase-fill"></div>
+
+            <!-- ILUSTRAÇÃO DA CENA -->
+            <div class="historia-imagem-area" id="historia-imagem-area">
+              <div class="historia-emoji-cena" id="historia-emoji-cena">🌲🏡🌸</div>
             </div>
-            <div class="leitura-corpo">
-              <div class="historia-imagem-area" id="historia-imagem-area">
-                <div class="historia-emoji-cena" id="historia-emoji-cena">🌲🏡🌸</div>
+
+            <!-- CARTÃO DO LIVRO -->
+            <div class="cartao-livro-leitura" id="cartao-livro-leitura">
+              <div class="livro-folha-topo">
+                <span class="livro-pagina-indicador" id="livro-pagina-indicador">Página 1 de 1</span>
+                <span class="livro-contagem-palavras" id="livro-contagem-palavras">150 palavras</span>
               </div>
               <div class="historia-texto" id="historia-texto"></div>
             </div>
-            <div class="interacao-area" id="interacao-area"></div>
+
+            <!-- NAVEGAÇÃO DE PÁGINAS (Se passar de 150 palavras) -->
+            <div class="livro-navegacao-paginas" id="livro-navegacao-paginas" style="display:none">
+              <button class="btn-virar-pagina btn-pagina-anterior" id="btn-pagina-anterior" disabled aria-label="Página anterior">
+                <span class="seta">←</span> <span class="btn-texto-completo">Página Anterior</span><span class="btn-texto-curto">Anterior</span>
+              </button>
+              <div class="livro-paginacao-dots" id="livro-paginacao-dots"></div>
+              <button class="btn-virar-pagina btn-proxima-pagina" id="btn-proxima-pagina" aria-label="Próxima página">
+                <span class="btn-texto-completo">Próxima Página</span><span class="btn-texto-curto">Próxima</span> <span class="seta">→</span>
+              </button>
+            </div>
+
+            <div class="interacao-area oculto" id="interacao-area" style="display:none"></div>
             <div class="feedback-area oculto" id="feedback-area">
               <div class="feedback-card" id="feedback-card">
                 <div class="feedback-emoji" id="feedback-emoji">🎉</div>
                 <p class="feedback-msg" id="feedback-msg">Muito bem!</p>
               </div>
             </div>
+
             <div class="leitura-rodape">
-              <button class="btn-secundario" id="btn-pular-fase">Pular fase →</button>
-              <button class="btn-principal" id="btn-continuar" style="display:none">Próxima Fase 🚀</button>
+              <button class="btn-secundario" id="btn-pular-fase" style="display:none">Pular fase →</button>
+              <button class="btn-principal" id="btn-continuar" style="display:none">Vamos Jogar! 🚀 (5 minigames)</button>
             </div>
           </div>
         </section>
